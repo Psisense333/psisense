@@ -1,109 +1,107 @@
 import React from "react";
 import {
- View,
- Text,
- TouchableOpacity,
- StyleSheet
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet
 } from "react-native";
 
 import {
- router,
- useLocalSearchParams
+  router,
+  useLocalSearchParams
 } from "expo-router";
 
 export default function TargetDetailScreen() {
 
- const {
-   targetId,
-   level
- } = useLocalSearchParams();
+  const params = useLocalSearchParams();
 
- return (
-   <View style={styles.container}>
+  const targetId = params.targetId || "Unknown";
+  const level = params.level || "1";
 
-     <Text style={styles.title}>
-       Target Detail
-     </Text>
+  return (
+    <View style={styles.container}>
 
-     <Text style={styles.text}>
-       Target ID: {targetId}
-     </Text>
+      <Text style={styles.title}>
+        Target Detail
+      </Text>
 
-     <Text style={styles.text}>
-       Level: {level}
-     </Text>
+      <Text style={styles.info}>
+        Target ID: {targetId}
+      </Text>
 
-     <TouchableOpacity
-       style={styles.button}
-       onPress={() =>
-         router.push({
-           pathname:
-             "/screens/RemoteViewingScreen",
+      <Text style={styles.info}>
+        Level: {level}
+      </Text>
 
-           params: {
-             targetId,
-             level
-           }
-         })
-       }
-     >
-       <Text style={styles.buttonText}>
-         Begin Viewing Session
-       </Text>
-     </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          router.push({
+            pathname: "/screens/RemoteViewingScreen",
+            params: {
+              targetId,
+              level
+            }
+          })
+        }
+      >
+        <Text style={styles.buttonText}>
+          Begin Viewing Session
+        </Text>
+      </TouchableOpacity>
 
-     <TouchableOpacity
-       onPress={() =>
-         router.back()
-       }
-     >
-       <Text style={styles.back}>
-         Back
-       </Text>
-     </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() =>
+          router.push("/screens/TargetListScreen")
+        }
+      >
+        <Text style={styles.back}>
+          Back
+        </Text>
+      </TouchableOpacity>
 
-   </View>
- );
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
 
- container:{
-   flex:1,
-   backgroundColor:"#111",
-   justifyContent:"center",
-   alignItems:"center",
-   padding:20
- },
+  container:{
+    flex:1,
+    backgroundColor:"#111",
+    justifyContent:"center",
+    alignItems:"center",
+    padding:20
+  },
 
- title:{
-   color:"#acf92c",
-   fontSize:28,
-   fontWeight:"bold",
-   marginBottom:30
- },
+  title:{
+    color:"#acf92c",
+    fontSize:28,
+    fontWeight:"bold",
+    marginBottom:30
+  },
 
- text:{
-   color:"#fff",
-   fontSize:18,
-   marginBottom:15
- },
+  info:{
+    color:"#fff",
+    fontSize:18,
+    marginBottom:12
+  },
 
- button:{
-   backgroundColor:"#acf92c",
-   padding:15,
-   borderRadius:12,
-   marginTop:25
- },
+  button:{
+    backgroundColor:"#acf92c",
+    padding:15,
+    borderRadius:12,
+    marginTop:30
+  },
 
- buttonText:{
-   color:"#000",
-   fontWeight:"bold"
- },
+  buttonText:{
+    color:"#000",
+    fontWeight:"bold"
+  },
 
- back:{
-   color:"#888",
-   marginTop:30
- }
+  back:{
+    color:"#888",
+    marginTop:30
+  }
 
 });

@@ -22,9 +22,7 @@ export default function TargetListScreen() {
   const initialLevel = Number(level || 1);
 
   const [targets, setTargets] = useState([]);
-  const [filteredLevel, setFilteredLevel] =
-    useState(initialLevel);
-
+  const [filteredLevel, setFilteredLevel] = useState(initialLevel);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,7 +30,6 @@ export default function TargetListScreen() {
   }, []);
 
   async function loadTargets() {
-
     try {
 
       const snapshot =
@@ -52,10 +49,7 @@ export default function TargetListScreen() {
 
     } catch (error) {
 
-      console.log(
-        "FIREBASE LOAD ERROR:",
-        error
-      );
+      console.log("FIREBASE LOAD ERROR:", error);
 
       setTargets([]);
 
@@ -73,15 +67,15 @@ export default function TargetListScreen() {
         Number(filteredLevel)
     );
 
+  // FIXED (only one openTarget function)
   function openTarget(item) {
 
     router.push({
-      pathname:
-        "/screens/TargetDetailScreen",
-
+      pathname: "/screens/TargetDetailScreen",
       params: {
-        targetId: item.id,
-        level: filteredLevel
+        targetId: item.targetNumber, // shows F82G49L etc
+        level: filteredLevel,
+        imageURL: item.imageURL
       }
     });
 
@@ -100,17 +94,18 @@ export default function TargetListScreen() {
   return (
     <View style={styles.container}>
 
+      {/* LEVEL SELECTOR */}
       <View style={styles.levelRow}>
+
         {[1,2,3,4,5].map(level => (
+
           <TouchableOpacity
             key={level}
             style={[
               styles.levelButton,
-
               filteredLevel === level &&
               styles.activeButton
             ]}
-
             onPress={() =>
               setFilteredLevel(level)
             }
@@ -119,7 +114,6 @@ export default function TargetListScreen() {
             <Text
               style={[
                 styles.levelText,
-
                 filteredLevel === level &&
                 styles.activeText
               ]}
@@ -128,9 +122,12 @@ export default function TargetListScreen() {
             </Text>
 
           </TouchableOpacity>
+
         ))}
+
       </View>
 
+      {/* TARGET LIST */}
       <FlatList
         data={displayedTargets}
 
@@ -147,20 +144,15 @@ export default function TargetListScreen() {
         renderItem={({ item }) => {
 
           const number =
-            String(
-              item?.targetNumber || ""
-            );
+            String(item?.targetNumber || "");
 
           const task =
-            String(
-              item?.task || ""
-            );
+            String(item?.task || "");
 
           return (
 
             <TouchableOpacity
               style={styles.card}
-
               onPress={() =>
                 openTarget(item)
               }
@@ -178,11 +170,7 @@ export default function TargetListScreen() {
                   {`Target ${number}`}
                 </Text>
 
-                <Text
-                  style={
-                    styles.levelTextSmall
-                  }
-                >
+                <Text style={styles.levelTextSmall}>
                   {`Level ${filteredLevel}`}
                 </Text>
 
@@ -199,7 +187,6 @@ export default function TargetListScreen() {
 
           );
         }}
-
       />
 
     </View>
