@@ -10,11 +10,21 @@ import {
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../_firebase/firebaseConfig";
 
-export default function TargetListScreen({ navigation, route }) {
+import {
+  router,
+  useLocalSearchParams
+} from "expo-router";
+
+export default function TargetListScreen() {
+
+  const { level } = useLocalSearchParams();
+
+  const initialLevel = Number(level || 1);
+
   const [targets, setTargets] = useState([]);
-  const [filteredLevel, setFilteredLevel] = useState(
-    route?.params?.level ?? 1
-  );
+  const [filteredLevel, setFilteredLevel] =
+    useState(initialLevel);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,8 +32,11 @@ export default function TargetListScreen({ navigation, route }) {
   }, []);
 
   async function loadTargets() {
+
     try {
-      const snapshot = await getDocs(collection(db, "Targets"));
+
+      const snapshot =
+        await getDocs(collection(db, "Targets"));
 
       if (!snapshot?.docs) {
         setTargets([]);
@@ -36,183 +49,246 @@ export default function TargetListScreen({ navigation, route }) {
       }));
 
       setTargets(list);
+
     } catch (error) {
-      console.log("FIREBASE LOAD ERROR:", error);
+
+      console.log(
+        "FIREBASE LOAD ERROR:",
+        error
+      );
+
       setTargets([]);
+
     } finally {
+
       setLoading(false);
+
     }
   }
 
-  const displayedTargets = targets.filter(
-    (t) => Number(t?.level ?? 0) === Number(filteredLevel)
-  );
+  const displayedTargets =
+    targets.filter(
+      t =>
+        Number(t?.level || 0) ===
+        Number(filteredLevel)
+    );
+
+  function openTarget(item) {
+
+    router.push({
+      pathname:
+        "/screens/TargetDetailScreen",
+
+      params: {
+        targetId: item.id,
+        level: filteredLevel
+      }
+    });
+
+  }
 
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.emptyText}>Loading targets...</Text>
+        <Text style={styles.emptyText}>
+          Loading targets...
+        </Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      {/* LEVEL BUTTONS */}
+
       <View style={styles.levelRow}>
-        {[1, 2, 3, 4, 5].map((level) => (
+        {[1,2,3,4,5].map(level => (
           <TouchableOpacity
             key={level}
             style={[
               styles.levelButton,
-              filteredLevel === level && styles.activeButton,
+
+              filteredLevel === level &&
+              styles.activeButton
             ]}
-            onPress={() => setFilteredLevel(level)}
+
+            onPress={() =>
+              setFilteredLevel(level)
+            }
           >
+
             <Text
               style={[
                 styles.levelText,
-                filteredLevel === level && styles.activeText,
+
+                filteredLevel === level &&
+                styles.activeText
               ]}
             >
               {`Level ${level}`}
             </Text>
+
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* TARGET LIST */}
       <FlatList
         data={displayedTargets}
+
         keyExtractor={(item) =>
-          String(item?.id ?? Math.random())
+          String(item.id)
         }
+
         ListEmptyComponent={
           <Text style={styles.emptyText}>
             No targets for this level
           </Text>
         }
+
         renderItem={({ item }) => {
-          const number = String(item?.targetNumber ?? "");
-          const level = String(item?.level ?? "");
-          const task = String(item?.task ?? "");
+
+          const number =
+            String(
+              item?.targetNumber || ""
+            );
+
+          const task =
+            String(
+              item?.task || ""
+            );
 
           return (
+
             <TouchableOpacity
               style={styles.card}
+
               onPress={() =>
-                navigation.navigate("TargetDetail", {
-                  target: item,
-                  level: filteredLevel,
-                })
+                openTarget(item)
               }
             >
+
               <View style={styles.noImage}>
-                <Text style={styles.qmark}>?</Text>
+                <Text style={styles.qmark}>
+                  ?
+                </Text>
               </View>
 
               <View style={styles.info}>
+
                 <Text style={styles.title}>
                   {`Target ${number}`}
                 </Text>
 
-                <Text style={styles.levelTextSmall}>
-                  {`Level ${level}`}
+                <Text
+                  style={
+                    styles.levelTextSmall
+                  }
+                >
+                  {`Level ${filteredLevel}`}
                 </Text>
 
-                <Text numberOfLines={2} style={styles.task}>
+                <Text
+                  numberOfLines={2}
+                  style={styles.task}
+                >
                   {task}
                 </Text>
+
               </View>
+
             </TouchableOpacity>
+
           );
         }}
+
       />
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+
   container: {
-    flex: 1,
-    backgroundColor: "#111",
-    padding: 10,
+    flex:1,
+    backgroundColor:"#111",
+    padding:10,
   },
 
   levelRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 15,
+    flexDirection:"row",
+    justifyContent:"space-between",
+    marginBottom:15,
   },
 
   levelButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: "#222",
-    borderRadius: 8,
+    paddingVertical:8,
+    paddingHorizontal:12,
+    backgroundColor:"#222",
+    borderRadius:8,
   },
 
   activeButton: {
-    backgroundColor: "#acf92c",
+    backgroundColor:"#acf92c",
   },
 
   levelText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color:"#fff",
+    fontWeight:"bold",
   },
 
   activeText: {
-    color: "#000",
+    color:"#000",
   },
 
   emptyText: {
-    color: "#777",
-    textAlign: "center",
-    marginTop: 40,
-    fontSize: 16,
+    color:"#777",
+    textAlign:"center",
+    marginTop:40,
+    fontSize:16,
   },
 
   card: {
-    flexDirection: "row",
-    backgroundColor: "#1b1b1b",
-    borderRadius: 10,
-    marginBottom: 12,
-    padding: 10,
+    flexDirection:"row",
+    backgroundColor:"#1b1b1b",
+    borderRadius:10,
+    marginBottom:12,
+    padding:10,
   },
 
   noImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    backgroundColor: "#333",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
+    width:80,
+    height:80,
+    borderRadius:8,
+    backgroundColor:"#333",
+    alignItems:"center",
+    justifyContent:"center",
+    marginRight:10,
   },
 
   qmark: {
-    color: "#777",
-    fontSize: 32,
+    color:"#777",
+    fontSize:32,
   },
 
   info: {
-    flex: 1,
-    justifyContent: "center",
+    flex:1,
+    justifyContent:"center",
   },
 
   title: {
-    color: "#acf92c",
-    fontSize: 16,
-    fontWeight: "bold",
+    color:"#acf92c",
+    fontSize:16,
+    fontWeight:"bold",
   },
 
   levelTextSmall: {
-    color: "#888",
-    marginTop: 2,
+    color:"#888",
+    marginTop:2,
   },
 
   task: {
-    color: "#bbb",
-    marginTop: 4,
-  },
+    color:"#bbb",
+    marginTop:4,
+  }
+
 });
