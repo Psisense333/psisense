@@ -70,16 +70,24 @@ export default function TargetListScreen() {
   // FIXED (only one openTarget function)
   function openTarget(item) {
 
-    router.push({
-      pathname: "/screens/TargetDetailScreen",
-      params: {
-        targetId: item.targetNumber, // shows F82G49L etc
-        level: filteredLevel,
-        imageURL: item.imageURL
-      }
-    });
+  const targetCode = item.targetNumber;
 
-  }
+  const imageURL =
+   item.imageURL ||
+   `https://raw.githubusercontent.com/Psisense333/psisense/main/targets/level${filteredLevel}/${targetCode}.jpg`;
+
+  router.push({
+    pathname: "/screens/TargetDetailScreen",
+
+    params: {
+      targetId: targetCode,
+      level: filteredLevel,
+      imageURL: imageURL
+    }
+
+  });
+
+}
 
   if (loading) {
     return (
