@@ -80,7 +80,7 @@ export default function TargetListScreen() {
     pathname: "/screens/TargetDetailScreen",
 
     params: {
-      targetId: targetCode,
+      targetId: item.targetNumber,
       level: filteredLevel,
       imageURL: imageURL
     }
